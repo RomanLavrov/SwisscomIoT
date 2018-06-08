@@ -1,0 +1,28 @@
+﻿@{}
+<form method="post" enctype="multipart/form-data" asp-controller="Home" asp-action="Upload" style="width: 600px">
+    <div class="input-group" style="float: left; position: relative; width:400px">
+
+        <label class="input-group-btn" id="Test">
+            <span class="btn btn-primary">
+                Browse <input type="file" id="package-file-select" name="file" style="display: none" value="" onchange="myFunction(this.value);" />
+            </span>
+        </label>
+        <input class="form-control" id="FileName" type="text" placeholder="No file selected" readonly />
+    </div>
+
+    <div>
+        <label class="btn btn-success" style="position: relative; margin-left: 10px" id="Upload">
+            Upload
+            <input type="submit" value="Upload" name="Submit" id="Submit" style="display: none;" />
+        </label>
+    </div>
+
+    <script>
+       function myFunction(val) {
+           var textField = document.getElementById("FileName");
+           var label = val.replace(/\\/g, '/').replace(/.*\//, '');
+           textField.placeholder = label;
+       }
+    </script>
+</form>
+

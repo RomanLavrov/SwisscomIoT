@@ -2,7 +2,6 @@
 var viewables;
 var indexVieable;
 
-console.log('Attribute application');
 
 var options = {
     env: 'AutodeskProduction',
@@ -43,11 +42,11 @@ function onDocumentLoadFailure(viewerErrorCode) {
     console.error('onDocumentloadFailure() - errorCode: ' + viewerErrorCode);
 }
 function onItemLoadSuccess(viewer, item) {
-    console.log('onItemLoadSuccess()');
-    console.log(viewer);
-    console.log(item);
+   // console.log('onItemLoadSuccess()');
+   // console.log(viewer);
+   // console.log(item);
 
-    console.log('Viewers are equal: ' + (viewer === viewerApp.getCurrentViewer()));
+   // console.log('Viewers are equal: ' + (viewer === viewerApp.getCurrentViewer()));
 }
 
 function onItemLoadFail(errorCode) {

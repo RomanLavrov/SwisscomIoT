@@ -2,7 +2,7 @@
 var model;
 
 function showModel(urn) {
-    console.log("URN: " + urn);
+    console.log("URN: " + urn);   
     if (urn === '') {
         runUpload();
     }
@@ -11,7 +11,8 @@ function showModel(urn) {
         var UploadButton = document.getElementById("Upload");
         var SelectedFile = document.getElementById("FileName");
         SelectedFile.value = 'default';
-        UploadButton.click();
+         UploadButton.click();
+
     }
 
     var options = {
@@ -23,12 +24,12 @@ function showModel(urn) {
     var documentId = 'urn:' + urn;
     
     console.log("BEAREAR: " + getAccessToken());
-    console.log("Viewing " + window.Autodesk);
+    //console.log("Viewing " + window.Autodesk);
 
     window.Autodesk.Viewing.Initializer(options, function onInitialized() {
 
         viewerApp = new window.Autodesk.Viewing.ViewingApplication('MyViewerDiv');
-
+        // 'Autodesk.ADN.Viewing.Extension.Toolbar'
         //Configure the extension
         var config3D = {
             extensions: ["AttributeExtension"]
@@ -37,6 +38,16 @@ function showModel(urn) {
         viewerApp.registerViewer(viewerApp.k3D, window.Autodesk.Viewing.Private.GuiViewer3D, config3D);
         viewerApp.loadDocument(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
     });
+
+
+    function getAccessToken() {
+        var xmlHttp = null;
+        //console.log("Create request");
+        xmlHttp = new XMLHttpRequest();
+        xmlHttp.open("GET", '/api/forge/token', false /*forge viewer requires SYNC*/);
+        xmlHttp.send(null);
+        return xmlHttp.responseText;
+    }
 }
 
 function onDocumentLoadSuccess(doc) {
@@ -71,11 +82,3 @@ function onItemLoadFail(errorCode) {
 * the JavaScript getAccessToken on client-side. 
 * To retrive viewer token
 */
-function getAccessToken() {
-    var xmlHttp = null;
-    console.log("Create request");
-    xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", '/api/forge/token', false /*forge viewer requires SYNC*/);
-    xmlHttp.send(null);
-    return xmlHttp.responseText;
-}

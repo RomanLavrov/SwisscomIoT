@@ -10,28 +10,37 @@ using Microsoft.AspNetCore.Http.Internal;
 using Autodesk.Forge;
 using Autodesk.Forge.Model;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.DotNet.PlatformAbstractions;
 
 namespace SwisscomIoT.Controllers
 {
     public class HomeController : Controller
     {
+        private IHostingEnvironment _env;
+        public HomeController(IHostingEnvironment env)
+        {
+            _env = env;
+        }
         public IActionResult Index(string URN)
         {
             return View((object)URN);
         }
+               
 
         [HttpPost("Home/Upload")]
         public async Task<IActionResult> Post(IFormFile file)
         {
             string fileName = string.Empty;
-           
-            string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();
+
+            string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();          
 
             string tempFilePath = Path.GetTempFileName();
             if (file == null || file.Length == 0)
             {
                 byte[] data;
                 string preloadURL = @"https://forgefiles.blob.core.windows.net/forgefiles/CC303_170830_16035_4000ff%20Werkplan_V006.nwc";
+               //string preloadURL = "https://forgefiles.blob.core.windows.net/forgefiles/FireDetectorsForge.rvt";
 
                 using (WebClient client = new WebClient())
                 {
@@ -41,7 +50,7 @@ namespace SwisscomIoT.Controllers
                     FormFile f = new FormFile(stream, 0, data.Length, "test", "FireDetectorsForge.nwc");
                     file = f;
                 }
-                //return Content("File not found");
+
             }
 
             fileName = file.FileName;

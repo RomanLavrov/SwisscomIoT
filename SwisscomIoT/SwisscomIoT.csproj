@@ -8,6 +8,10 @@
   <PropertyGroup>
     <UserSecretsId>aspnet-SwisscomIoT-058b78eb-d85d-4cea-9475-5c8261be07de</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\layout\Swisscom_detached-3DView-UG1_RaumU103a.fbx" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autodesk.Forge" Version="1.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />
@@ -32,6 +36,9 @@
     <DotNetCliToolReference Include="Microsoft.EntityFrameworkCore.Tools.DotNet" Version="1.0.2" />
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="1.0.1" />
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="wwwroot\layout\Swisscom_detached-3DView-UG1_RaumU103a.fbx" />
   </ItemGroup>
 
 </Project>

@@ -32,14 +32,14 @@ function initApplication(urn) {
 function onDocumentLoadSuccess(doc) {
     viewables = viewerApp.bubble.search({ 'type': 'geometry' });
     if (viewables.length === 0) {
-        console.error('Document contains no viewables');
+        console.log('Document contains no viewables');
         return;
     }
     viewerApp.selectItem(viewables[0].data, onItemLoadSuccess, onItemLoadFail);
 }
 
 function onDocumentLoadFailure(viewerErrorCode) {
-    console.error('onDocumentloadFailure() - errorCode: ' + viewerErrorCode);
+    console.log('Document load error - errorCode: ' + viewerErrorCode);
 }
 function onItemLoadSuccess(viewer, item) {
    // console.log('onItemLoadSuccess()');

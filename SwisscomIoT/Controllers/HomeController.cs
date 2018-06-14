@@ -22,46 +22,47 @@ namespace SwisscomIoT.Controllers
         {
             _env = env;
         }
+
         public IActionResult Index(string URN)
         {
             return View((object)URN);
         }
                
-
         [HttpPost("Home/Upload")]
         public async Task<IActionResult> Post(IFormFile file)
         {
-            string fileName = string.Empty;
+            //string fileName = string.Empty;
+            string fileName = "Swisscom.rvt";
+            string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();
 
-            string bucketKey = "forgeapp" + Guid.NewGuid().ToString("N").ToLower();          
+            //string tempFilePath = Path.GetTempFileName();
+            string tempFilePath = _env.ContentRootPath + "/wwwroot/layout/Swisscom_detached.rvt";
+            //if (file == null || file.Length == 0)
+            //{
+            //    byte[] data;
+            //    string preloadURL = @"https://forgefiles.blob.core.windows.net/forgefiles/CC303_170830_16035_4000ff%20Werkplan_V006.nwc";
+            //   //string preloadURL = "https://forgefiles.blob.core.windows.net/forgefiles/FireDetectorsForge.rvt";
 
-            string tempFilePath = Path.GetTempFileName();
-            if (file == null || file.Length == 0)
-            {
-                byte[] data;
-                string preloadURL = @"https://forgefiles.blob.core.windows.net/forgefiles/CC303_170830_16035_4000ff%20Werkplan_V006.nwc";
-               //string preloadURL = "https://forgefiles.blob.core.windows.net/forgefiles/FireDetectorsForge.rvt";
+            //    using (WebClient client = new WebClient())
+            //    {
+            //        data = client.DownloadData(preloadURL);
+            //        Stream stream = new MemoryStream();
+            //        stream.Write(data, 0, data.Length);
+            //        FormFile f = new FormFile(stream, 0, data.Length, "test", "FireDetectorsForge.nwc");
+            //        file = f;
+            //    }
 
-                using (WebClient client = new WebClient())
-                {
-                    data = client.DownloadData(preloadURL);
-                    Stream stream = new MemoryStream();
-                    stream.Write(data, 0, data.Length);
-                    FormFile f = new FormFile(stream, 0, data.Length, "test", "FireDetectorsForge.nwc");
-                    file = f;
-                }
+            //}
 
-            }
+            //fileName = file.FileName;
 
-            fileName = file.FileName;
-
-            if (file.Length > 0)
-            {
-                using (var stream = new FileStream(tempFilePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-            }
+            //if (file.Length > 0)
+            //{
+            //    using (var stream = new FileStream(tempFilePath, FileMode.Create))
+            //    {
+            //        await file.CopyToAsync(stream);
+            //    }
+            //}
 
             //Get Token
             TwoLeggedApi oauthApi = new TwoLeggedApi();
@@ -130,7 +131,7 @@ namespace SwisscomIoT.Controllers
             } while (progress < 100);
 
             //Delete temp file
-            System.IO.File.Delete(tempFilePath);
+            //System.IO.File.Delete(tempFilePath);
 
             return RedirectToAction("Index", new { URN = (object)objectIdBase64 });
         }

@@ -9,9 +9,57 @@
     <link rel="stylesheet" href="https://developer.api.autodesk.com/modelderivative/v2/viewers/style.min.css" type="text/css" />
     <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/three.min.js"></script>
     <script src="https://developer.api.autodesk.com/viewingservice/v1/viewers/viewer3D.min.js"></script>
-    <script src="/js/forge.js"></script>
-    <script src="/js/AttributeApplication.js"></script>
-    <script src="/js/AttributeExtension.js"></script>
+    <script src="@Url.Content("/js/forge.js")"></script>
+    <script src="@Url.Content("/js/AttributeApplication.js")"></script>
+    <script src="@Url.Content("/js/AttributeExtension.js")"></script>
+    <script src="@Url.Content("/js/markupExt.js")"></script>
+  
+    @*<style>
+        .toolbar-button-Detector {
+            background-image: url("/images/detector.png");
+            background-size: 40px;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+
+        .toolbar-button-Mark {
+            margin-top: 40px;
+            background-image: url("/images/label.png");
+            background-size: 40px;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+
+        .toolbar-button-Meter {
+            margin-top: 40px;
+            background-image: url("/images/meter.png");
+            background-size: 40px;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+
+        .toolbar-button-Attributes {
+            margin-top: 40px;
+            background-image: url("/images/attributes.png");
+            background-size: 40px;
+            background-repeat: no-repeat;
+            object-fit: cover;
+        }
+
+        .toolbar-vertical-group {
+            margin: 20%;
+            width: 50px;
+            height: auto;
+        }
+
+        #divToolbar {
+            background: red;
+            top: 50%;
+            left: 94%;
+            z-index: 10000;
+            position: absolute;
+        }
+    </style>*@
 
     <title>Swisscom</title>
 </head>

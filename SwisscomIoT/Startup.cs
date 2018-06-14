@@ -70,7 +70,6 @@ namespace SwisscomIoT
             {
                 app.UseExceptionHandler("/Home/Error");
             }
-
             app.UseStaticFiles();
 
             app.UseIdentity();

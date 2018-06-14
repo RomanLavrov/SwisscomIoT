@@ -1,48 +1,55 @@
 ﻿var viewerApp;
 var model;
 
+function post(path, method) {
+
+    var form = document.createElement("form");
+    form.setAttribute("action", path);
+    form.setAttribute("method", method);
+    document.body.appendChild(form);
+    form.submit();
+}
+
 function showModel(urn) {
-    console.log("URN: " + urn);   
+    console.log("URN: " + urn);
+    //runUpload();
+   
     if (urn === '') {
-        runUpload();
+        post("Home/Upload", "post");
     }
-
-     function runUpload() {
-        var UploadButton = document.getElementById("Upload");
-        var SelectedFile = document.getElementById("FileName");
-        SelectedFile.value = 'default';
-         UploadButton.click();
-
-    }
+   
+    //function runUpload() {
+    //    var UploadButton = document.getElementById("Upload");
+    //    var SelectedFile = document.getElementById("FileName");
+    //    SelectedFile.value = 'default';
+    //    UploadButton.click();
+    //}
 
     var options = {
         env: 'AutodeskProduction',
         getAccessToken: getAccessToken,
         refreshToken: getAccessToken
     };
-    
+
     var documentId = 'urn:' + urn;
-    
+
     console.log("BEAREAR: " + getAccessToken());
-    //console.log("Viewing " + window.Autodesk);
 
     window.Autodesk.Viewing.Initializer(options, function onInitialized() {
 
         viewerApp = new window.Autodesk.Viewing.ViewingApplication('MyViewerDiv');
-        // 'Autodesk.ADN.Viewing.Extension.Toolbar'
         //Configure the extension
         var config3D = {
-            extensions: ["AttributeExtension"]
+            extensions: ["AttributeExtension", "markup3d"]
         };
 
         viewerApp.registerViewer(viewerApp.k3D, window.Autodesk.Viewing.Private.GuiViewer3D, config3D);
         viewerApp.loadDocument(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
-    });
 
+    });
 
     function getAccessToken() {
         var xmlHttp = null;
-        //console.log("Create request");
         xmlHttp = new XMLHttpRequest();
         xmlHttp.open("GET", '/api/forge/token', false /*forge viewer requires SYNC*/);
         xmlHttp.send(null);
@@ -51,7 +58,7 @@ function showModel(urn) {
 }
 
 function onDocumentLoadSuccess(doc) {
-   
+
     var viewables = viewerApp.bubble.search({ 'type': 'geometry' });
     if (viewables.length === 0) {
         console.error('Document contains no viewables.');
@@ -67,10 +74,6 @@ function onDocumentLoadFailure(viewerErrorCode) {
 }
 
 function onItemLoadSuccess(viewer, item) {
-    //console.log('onItemLoadSuccess()!');
-    //console.log(viewer);
-    //console.log(item);
-    //console.log('Viewers are equal: ' + (viewer === viewerApp.getCurrentViewer()));
     model = viewer.model;
 }
 
@@ -78,7 +81,32 @@ function onItemLoadFail(errorCode) {
     console.error('onItemLoadFail() - errorCode:' + errorCode);
 }
 
-/**
-* the JavaScript getAccessToken on client-side. 
-* To retrive viewer token
-*/
+var dummyData = [];
+for (let i = 0; i < 20; i++) {
+    dummyData.push({
+        icon: Math.round(Math.random() * 3),
+        x: Math.random() * 30000 - 1500,
+        y: Math.random() * 5000 - 200,
+        z: Math.random() * 15000 - 1300
+    });
+}
+
+window.dispatchEvent(
+    new CustomEvent('newData', { 'detail': dummyData })
+);
+
+window.addEventListener("onMarkupClick", e => {
+    var elem = $("label");
+    elem.style.display = "block";
+    moveLabel(e.detail);
+    elem.innerHTML = `<img src="images/${(e.detail.id % 6)}.jpg"><br>Markup ID:${e.detail.id}`;
+}, false);
+
+window.addEventListener("onMarkupMove", e => {
+    moveLabel(e.detail);
+}, false);
+
+function moveLabel(p) {
+    elem.style.left = (p.x + 1) / 2 * window.innerWidth + 'px';
+    elem.style.top = -(p.y - 1) / 2 * window.innerHeight + 'px';
+}

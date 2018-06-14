@@ -1,11 +1,9 @@
 ﻿// MarkupExt.js
-
-
 function markup3d(viewer, options) {
     Autodesk.Viewing.Extension.call(this, viewer, options);
     this.raycaster = new THREE.Raycaster();
     this.raycaster.params.PointCloud.threshold = 5; // hit-test markup size.  Change this if markup 'hover' doesn't work
-    this.size = 1500.0; // markup size.  Change this if markup size is too big or small
+    this.size = 150.0; // markup size.  Change this if markup size is too big or small
     this.lineColor = 0xcccccc; // off-white
     this.labelOffset = new THREE.Vector3(120, 120, 0);  // label offset 3D line offset position
     this.xDivOffset = -0.2;  // x offset position of the div label wrt 3D line.
@@ -42,7 +40,6 @@ function markup3d(viewer, options) {
         }
     `;
 
-    console.log("Markup started");
 }
 
 markup3d.prototype = Object.create(Autodesk.Viewing.Extension.prototype);
@@ -53,7 +50,7 @@ markup3d.prototype.updateHitTest = function (event) {
     // https://stackoverflow.com/questions/28209645/raycasting-involving-individual-points-in-a-three-js-pointcloud
     if (!this.pointCloud) return;
     var x = event.clientX / window.innerWidth * 2 - 1;
-    var y = -event.clientY / window.innerHeight * 2 + 1;
+    var y = -(event.clientY / window.innerHeight) * 2 + 1;
     var vector = new THREE.Vector3(x, y, 0.5).unproject(this.camera);
     this.raycaster.set(this.camera.position, vector.sub(this.camera.position).normalize());
     var nodes = this.raycaster.intersectObject(this.pointCloud);
@@ -73,22 +70,15 @@ markup3d.prototype.unload = function () {
 
 markup3d.prototype.load = function () {
     var self = this;
-    var model = null;
-    console.log(viewer.model);
-    //------
-    viewer.addEventListener(Autodesk.Viewing.OBJECT_TREE_CREATED_EVENT, function () {
-        console.log("===" + viewer.model);
-        this.offset = viewer.model.getData().globalOffset; // use global offset to align pointCloud with lmv scene
-
-    });
+    this.offset = viewer.model.getData().globalOffset; // use global offset to align pointCloud with lmv scene
 
     // setup listeners for new data and mouse events
     window.addEventListener("newData", e => { this.setMarkupData(e.detail); }, false);
-    document.addEventListener('click', e => { this.onClick(e); }, false);
+    document.addEventListener('mousedown', e => { this.onClick(e); }, true);
+    document.addEventListener('touchstart', e => { this.onClick(e.changedTouches[0]); }, false);
     document.addEventListener('mousemove', e => { this.onMouseMove(e); }, false);
-    document.addEventListener('touchend', e => { this.onClickTouch(e); }, false);
+    document.addEventListener('touchmove', e => { this.onMouseMove(e.changedTouches[0]); }, false);
     document.addEventListener('mousewheel', e => { this.onMouseMove(e); }, true);
-
 
 
     // Load markup points into Point Cloud
@@ -115,7 +105,7 @@ markup3d.prototype.load = function () {
                 vertexColors: THREE.VertexColors,
                 fragmentShader: this.fragmentShader,
                 vertexShader: this.vertexShader,
-                depthWrite: false,  //true = hidden, false = on top
+                depthWrite: true,
                 depthTest: true,
                 uniforms: {
                     size: { type: "f", value: this.size },
@@ -162,8 +152,8 @@ markup3d.prototype.load = function () {
         this.updateHitTest(event);
     };
 
-
     this.onClick = function () {
+        this.updateHitTest(event);
         if (!this.hovered) return;
         this.selected = this.hovered;
         this.update_Line();
@@ -172,13 +162,8 @@ markup3d.prototype.load = function () {
         viewer.clearSelection();
     };
 
-
-    this.onClickTouch = function (t) {
-        this.updateHitTest(t.changedTouches[0]);
-        onDocumentMouseClick();
-    };
     return true;
 };
 
+
 Autodesk.Viewing.theExtensionManager.registerExtension('markup3d', markup3d);
-//view rawmarkupExt.js hosted with ❤ by GitHub

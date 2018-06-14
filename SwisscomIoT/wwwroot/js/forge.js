@@ -12,48 +12,41 @@ function post(path, method) {
 
 function showModel(urn) {
     console.log("URN: " + urn);
-    //runUpload();
-   
+    
     if (urn === '') {
         post("Home/Upload", "post");
     }
-   
-    //function runUpload() {
-    //    var UploadButton = document.getElementById("Upload");
-    //    var SelectedFile = document.getElementById("FileName");
-    //    SelectedFile.value = 'default';
-    //    UploadButton.click();
-    //}
-
-    var options = {
-        env: 'AutodeskProduction',
-        getAccessToken: getAccessToken,
-        refreshToken: getAccessToken
-    };
-
-    var documentId = 'urn:' + urn;
-
-    console.log("BEAREAR: " + getAccessToken());
-
-    window.Autodesk.Viewing.Initializer(options, function onInitialized() {
-
-        viewerApp = new window.Autodesk.Viewing.ViewingApplication('MyViewerDiv');
-        //Configure the extension
-        var config3D = {
-            extensions: ["AttributeExtension", "markup3d"]
+    else {
+        var options = {
+            env: 'AutodeskProduction',
+            getAccessToken: getAccessToken,
+            refreshToken: getAccessToken
         };
 
-        viewerApp.registerViewer(viewerApp.k3D, window.Autodesk.Viewing.Private.GuiViewer3D, config3D);
-        viewerApp.loadDocument(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
+        var documentId = 'urn:' + urn;
 
-    });
+        console.log("BEAREAR: " + getAccessToken());
 
-    function getAccessToken() {
-        var xmlHttp = null;
-        xmlHttp = new XMLHttpRequest();
-        xmlHttp.open("GET", '/api/forge/token', false /*forge viewer requires SYNC*/);
-        xmlHttp.send(null);
-        return xmlHttp.responseText;
+        window.Autodesk.Viewing.Initializer(options, function onInitialized() {
+
+            viewerApp = new window.Autodesk.Viewing.ViewingApplication('MyViewerDiv');
+            //Configure the extension
+            var config3D = {
+                extensions: ["AttributeExtension", "markup3d"]
+            };
+
+            viewerApp.registerViewer(viewerApp.k3D, window.Autodesk.Viewing.Private.GuiViewer3D, config3D);
+            viewerApp.loadDocument(documentId, onDocumentLoadSuccess, onDocumentLoadFailure);
+
+        });
+
+        function getAccessToken() {
+            var xmlHttp = null;
+            xmlHttp = new XMLHttpRequest();
+            xmlHttp.open("GET", '/api/forge/token', false /*forge viewer requires SYNC*/);
+            xmlHttp.send(null);
+            return xmlHttp.responseText;
+        }
     }
 }
 

@@ -14,7 +14,33 @@
     <script src="@Url.Content("/js/AttributeApplication.js")"></script>
     <script src="@Url.Content("/js/AttributeExtension.js")"></script>
     <script src="@Url.Content("/js/markupExt.js")"></script>
+    <style>       
 
+        #label {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            border: 2px solid #ccc;
+            background-color: #404040;
+            border-radius: 25px;
+            padding: 10px;
+        }
+
+            #label img {
+                width: 200px;
+            }
+
+        #menu {
+            margin: 30px;
+            padding: 0px 25px 5px 0px;
+            position: absolute;
+            background-color: #404040;
+            border: 2px solid white;
+            border-radius: 25px;
+            box-shadow: 10px 10px 15px #707070;
+            z-index: 2;
+        }
+    </style>
     @*<style>
             .toolbar-button-Detector {
                 background-image: url("/images/detector.png");
@@ -65,6 +91,7 @@
     <title>Swisscom</title>
 </head>
 <body>
+    <div id="label">na</div>
     <div>
         <div id="MyViewerDiv" style="height: 650px; width: 100%; background-image: url('images/loadingAnimation.gif'); background-repeat: no-repeat; background-size: contain; background-position: center; background-color: #ffffff; position: relative;"></div>
     </div>

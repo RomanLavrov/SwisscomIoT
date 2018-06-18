@@ -70,6 +70,7 @@ Autodesk.ADN.Viewing.Extension.CustomTool =
                 console.log('-------------------');
                 console.log('Tool:handleDoubleClick(event, button)');
                 console.log(event);
+                alert(event.canvasX);
                 console.log(button);
 
                 return false;

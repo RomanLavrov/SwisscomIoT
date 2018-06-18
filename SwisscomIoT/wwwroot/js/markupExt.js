@@ -1,10 +1,11 @@
-﻿
+﻿var offsetTest;
+
 function markup3d(viewer, options) {
     Autodesk.Viewing.Extension.call(this, viewer, options);
     this.viewer = viewer;
     this.raycaster = new THREE.Raycaster();
     this.raycaster.params.PointCloud.threshold = 5; // hit-test markup size.  Change this if markup 'hover' doesn't work
-    this.size = 400.0; // markup size.  Change this if markup size is too big or small
+    this.size = 4000.0; // markup size.  Change this if markup size is too big or small
     this.lineColor = 0xcccccc; // off-white
     this.labelOffset = new THREE.Vector3(120, 120, 0);  // label offset 3D line offset position
     this.xDivOffset = -0.2;  // x offset position of the div label wrt 3D line.
@@ -72,11 +73,11 @@ markup3d.prototype.unload = function () {
 
 markup3d.prototype.load = function () {
    
-    this.viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, function () {
-        console.log("viewer.model");
-        this.offset = viewer.model.getData().globalOffset; // use global offset to align pointCloud with lmv scene
-    });
-   
+    this.viewer.addEventListener(Autodesk.Viewing.GEOMETRY_LOADED_EVENT, function () {   
+        initializeMarkup();
+        this.offset = viewer.model.getData().globalOffset; // use global offset to align pointCloud with lmv scene 
+        offsetTest = viewer.model.getData().globalOffset;
+    
     var self = this;
     // setup listeners for new data and mouse events
     window.addEventListener("newData", e => { this.setMarkupData(e.detail); }, false);
@@ -85,8 +86,7 @@ markup3d.prototype.load = function () {
     document.addEventListener('mousemove', e => { this.onMouseMove(e); }, false);
     document.addEventListener('touchmove', e => { this.onMouseMove(e.changedTouches[0]); }, false);
     document.addEventListener('mousewheel', e => { this.onMouseMove(e); }, true);
-
-
+    
     // Load markup points into Point Cloud
     this.setMarkupData = function (data) {
         this.markupItems = data;
@@ -102,11 +102,12 @@ markup3d.prototype.load = function () {
 
 
     this.initMesh_PointCloud = function () {
+        console.log("Mesh initialised");
         if (this.pointCloud)
             this.scene.remove(this.pointCloud); //replace existing pointCloud Mesh
         else {
             // create new point cloud material
-            var texture = THREE.ImageUtils.loadTexture("img/icons.png");
+            var texture = THREE.ImageUtils.loadTexture("images/icons.png");
             var material = new THREE.ShaderMaterial({
                 vertexColors: THREE.VertexColors,
                 fragmentShader: this.fragmentShader,
@@ -120,12 +121,12 @@ markup3d.prototype.load = function () {
             });
         }
         this.pointCloud = new THREE.PointCloud(this.geometry, material);
+        
         this.pointCloud.position.sub(this.offset);
         this.scene.add(this.pointCloud);
     };
 
-
-
+    
     //this.initMesh_Line = function () {
     //    var geom = new THREE.Geometry();
     //    geom.vertices.push(new THREE.Vector3(0, 0, 0), new THREE.Vector3(1, 1, 1), );
@@ -156,20 +157,53 @@ markup3d.prototype.load = function () {
     // Dispatch Message when a point is clicked
     this.onMouseMove = function (event) {
         //this.update_DivLabel('onMarkupMove');
-        this.updateHitTest(event);
+        //this.updateHitTest(event);
     };
 
     this.onClick = function () {
-        this.updateHitTest(event);
+        //this.updateHitTest(event);
         if (!this.hovered) return;
         this.selected = this.hovered;
         //this.update_Line();
         //this.update_DivLabel('onMarkupClick');
         viewer.impl.invalidate(true);
         viewer.clearSelection();
-    };
+        };
+    });
 
     return true;
 };
+
+function initializeMarkup() {
+    console.log();
+    var elem = $("label");
+    // create 20 random markup points
+    // where icon is 0="Issue", 1="BIMIQ_Warning", 2="RFI", 3="BIMIQ_Hazard"
+    var dummyData = [];
+    for (let i = 0; i < 20; i++) {
+        dummyData.push({
+            icon: Math.round(Math.random() * 3),
+            x: Math.random() * 3000 - 1500,
+            y: Math.random() * 500 - 200,
+            z: Math.random() * 1500 - 1300
+           
+        });
+    }
+    console.log("Generated point" + dummyData[0].x);
+    window.dispatchEvent(new CustomEvent('newData', { 'detail': dummyData }));
+
+    function moveLabel(p) {
+        elem.style.left = ((p.x + 1) / 2 * window.innerWidth) + 'px';
+        elem.style.top = (-(p.y - 1) / 2 * window.innerHeight) + 'px';
+    }
+    // listen for the 'Markup' event, to re-position our <DIV> POPUP box
+    window.addEventListener("onMarkupMove", e => { moveLabel(e.detail) }, false)
+    window.addEventListener("onMarkupClick", e => {
+        elem.style.display = "block";
+        moveLabel(e.detail);
+        elem.innerHTML = `<img src="images/${(e.detail.id % 6)}.jpg"><br>Markup ID:${e.detail.id}`;
+    }, false);
+}
+
 
 Autodesk.Viewing.theExtensionManager.registerExtension('markup3d', markup3d);

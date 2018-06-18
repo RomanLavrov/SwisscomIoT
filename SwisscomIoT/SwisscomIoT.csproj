@@ -12,6 +12,10 @@
   <ItemGroup>
     <Content Remove="wwwroot\layout\Swisscom_detached-3DView-UG1_RaumU103a.fbx" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="wwwroot\images\chart.png" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Autodesk.Forge" Version="1.1.0" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.0.0" />

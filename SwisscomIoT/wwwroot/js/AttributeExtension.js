@@ -1,6 +1,7 @@
 ﻿var panelDetectors;
 var panelDashboard;
 var panelAttributes;
+var panelChart;
 var panel;
 var tree;
 var detectors = [];
@@ -11,6 +12,7 @@ function AttributeExtension(viewer, options) {
     panelDetectors = null;
     panelDashboard = null;
     panelAttributes = null;
+    panelChart = null;
 }
 AttributeExtension.prototype = Object.create(Autodesk.Viewing.Extension.prototype);
 AttributeExtension.prototype.constructor = AttributeExtension;
@@ -36,7 +38,7 @@ AttributeExtension.prototype.load = function () {
         var rootName = tree.getNodeName(rootId);
         var childCount = 0;
         var list;
-        
+
         tree.enumNodeChildren(rootId, function (childId) {
             var childName = tree.getNodeName(childId);
             detectors.push(childName);
@@ -55,7 +57,7 @@ AttributeExtension.prototype.onSelectionEvent = function (event) {
     this.viewer.fitToView(currentSelection); // Scale screen to selected object!!!!
     //elementID.innerHTML = currentSelection;
     var SelectedId = parseInt(currentSelection);
-   
+
     httpGet(SelectedId);
 };
 
@@ -123,7 +125,7 @@ SimplePanel = function (parentContainer, id, title, content, x, y) {
     this.container.style.left = "10px";
     this.container.style.width = "auto";
     this.container.style.height = "auto";
-    this.container.style.resize = "auto";
+    this.container.style.resize = "both";
     this.container.style.left = x + "px";
     this.container.style.top = y + "px";
 };
@@ -168,7 +170,7 @@ SimplePanel.prototype.initialize = function () {
     html += ['<tr><td>' + "Material" + '</td><td><div id="propMaterial">-</div></td><td><input type="text" name="fname"></td></tr>'].join('\n');
     html += ['<tr><td>' + "Type" + '</td><td><div id="propType">-</div></td><td><input type="text" name="fname"></td></tr>'].join('\n');
     html += ['<tr><td></td><td></td><td style="text-align: center"><button style="color: black; width: 146px"> Save </button></td></tr>'];
-    
+
     html += ['</tbody>',
         '</table>',
         '</div>',
@@ -203,9 +205,16 @@ function Toolbar(viewer) {
 
     var buttonMeter = new Autodesk.Viewing.UI.Button('toolbar-button-Meter');
     buttonMeter.addClass('toolbar-button-Meter');
-    buttonMeter.setToolTip('Show Meter Dashboard');
+    buttonMeter.setToolTip('Show Dashboard');
     buttonMeter.onClick = function (e) {
         ShowDashboard(viewer, viewer.container);
+    };
+
+    var buttonChart = new Autodesk.Viewing.UI.Button('toolbar-button-Chart');
+    buttonChart.addClass('toolbar-button-Chart');
+    buttonChart.setToolTip('Show Chart');
+    buttonChart.onClick = function (e) {
+        ShowChart(viewer, viewer.container);
     };
 
     var buttonAttributes = new Autodesk.Viewing.UI.Button('toolbar-button-Attributes');
@@ -218,6 +227,7 @@ function Toolbar(viewer) {
     ctrlGroup.addControl(buttonDetectors);
     ctrlGroup.addControl(buttonMarks);
     ctrlGroup.addControl(buttonMeter);
+    ctrlGroup.addControl(buttonChart);
     ctrlGroup.addControl(buttonAttributes);
 
     toolbar.addControl(ctrlGroup);
@@ -237,7 +247,7 @@ function ShowDetectors(viewer, container, id, title, options) {
 }
 
 function ShowLabels() {
-    
+
     console.log("LABELS INIT");
 }
 
@@ -250,6 +260,17 @@ function ShowDashboard(viewer, container, id, title, options) {
     }
     // show/hide docking panel
     panelDashboard.setVisible(!panelDashboard.isVisible());
+}
+
+function ShowChart(viewer, container, id, title, options) {
+    console.log("Chart init");
+
+    if (panelChart === null) {
+        panelChart = new ChartPanel(viewer, viewer.container,
+            'awesomeExtensionPanel3', 'Chart');
+    }
+    // show/hide docking panel
+    panelChart.setVisible(!panelChart.isVisible());
 }
 
 function ShowAttributes(viewer, container, id, title, option) {
@@ -268,14 +289,14 @@ function DetectorsPanel(viewer, container, id, title, options) {
     // use this built-in style to support Themes on Viewer 4+
     this.container.classList.add('docking-panel-container-solid-color-a');
     this.container.style.top = "30%";
-    this.container.style.left = "80px";
+    this.container.style.left = "60%";
     this.container.style.width = "auto";
     this.container.style.height = "auto";
-    this.container.style.resize = "auto";
+    this.container.style.resize = "both";
 
     // this is where we should place the content of our panel
     var div = document.createElement('div');
-    div.style.margin = '20px';   
+    div.style.margin = '20px';
 
     var html = [
         '<div class="uicomponent-panel-controls-container">',
@@ -287,7 +308,7 @@ function DetectorsPanel(viewer, container, id, title, options) {
         '<tbody bgcolor="#323232">'].join('\n');
 
     for (var i = 0; i < detectors.length; i++) {
-        html += ['<tr><td><button class="btn btn-primary" style="color: white" onclick="showElement(' +i+ ');">' + detectors[i] + '</button></td></tr>'].join('\n');
+        html += ['<tr><td><button class="btn btn-primary" style="color: white" onclick="showElement(' + i + ');">' + detectors[i] + '</button></td></tr>'].join('\n');
     }
 
     html += ['</tbody>',
@@ -306,45 +327,164 @@ DetectorsPanel.prototype.constructor = DetectorsPanel;
 function DashboardPanel(viewer, container, id, title, options) {
     this.viewer = viewer;
     Autodesk.Viewing.UI.DockingPanel.call(this, container, id, title, options);
+    this.container.classList.add('docking-panel-container-solid-color-a');
+    this.container.style.top = "30%";
+    this.container.style.left = "80px";
+    this.container.style.width = "500px";
+    this.container.style.height = "auto";
+    this.container.style.resize = "both";
+    // this is where we should place the content of our panel
+    var div = document.createElement('div');
+    div.style.margin = '20px';
+
+
+    var html = ["<div>" + detectors[0] + "</div>"].join('\n');
+    html += ["<div id=\"dashboard_div\" style=\"width: 130px; height: 120px;display: inline-block;\"></div>"].join('\n');
+    html += ["<div>" + detectors[1] + "</div>"].join('\n');
+    html += ["<div id=\"dashboard_div1\" style=\"width: 130px; height: 120px; display: inline-block;\"></div>"].join('\n');
+    //-------------------------------------
+    google.charts.load('current', {
+        'packages': ['gauge']
+    });
+    google.charts.setOnLoadCallback(drawChart);
+
+    function drawChart() {
+        var data = google.visualization.arrayToDataTable([
+            ['Label', 'Value'],
+            ['Temp, °C', 22]
+        ]);
+
+        var options = {
+            min: 20,
+            max: 30,
+            width: 120,
+            height: 120,
+            redFrom: 28,
+            redTo: 30,
+            yellowFrom: 25,
+            yellowTo: 28,
+            greenFrom: 20,
+            greenTo: 25,
+            minorTicks: 5
+        };
+
+        var chart = new google.visualization.Gauge(document.getElementById('dashboard_div'));
+        var chart2 = new google.visualization.Gauge(document.getElementById('dashboard_div1'));
+
+        chart.draw(data, options);
+        chart2.draw(data, options);
+
+        setInterval(function () {
+            data.setValue(0, 1, Math.round(21 + 4 * Math.random()));
+            chart.draw(data, options);
+        }, 1000);
+
+        setInterval(function () {
+            data.setValue(0, 1, Math.round(21 + 4 * Math.random()));
+            chart2.draw(data, options);
+        }, 1200);
+    }
+
+    //--------------------------------------
+    div.innerHTML = html;
+    this.container.appendChild(div);
+}
+
+DashboardPanel.prototype = Object.create(Autodesk.Viewing.UI.DockingPanel.prototype);
+DashboardPanel.prototype.constructor = DashboardPanel;
+
+
+function ChartPanel(viewer, container, id, title, options) {
+    this.viewer = viewer;
+    Autodesk.Viewing.UI.DockingPanel.call(this, container, id, title, options);
 
     // the style of the docking panel
     // use this built-in style to support Themes on Viewer 4+
     this.container.classList.add('docking-panel-container-solid-color-a');
     this.container.style.top = "30%";
     this.container.style.left = "80px";
-    this.container.style.width = "auto";
+    this.container.style.width = "500px";
     this.container.style.height = "auto";
-    this.container.style.resize = "auto";
+    this.container.style.resize = "both";
 
     // this is where we should place the content of our panel
     var div = document.createElement('div');
     div.style.margin = '20px';
 
-    
-    var html = ["<div>Future Panel</div>"
-    ].join('\n');
+    var html = ["<div>" + detectors[0] + "</div>"].join('\n');
+    html += [" <div id=\"chart_div\"></div>"].join('\n');
+    html += ["<div>" + detectors[1] + "</div>"].join('\n');
+    html += [" <div id=\"chart_div2\"></div>"].join('\n');
 
-    // and may also append child elements...
+
+    //-------------------------------------
+    google.charts.load('current', { packages: ['corechart', 'line'] });
+    google.charts.setOnLoadCallback(drawBackgroundColor);
+
+    function drawBackgroundColor() {
+        var data = new google.visualization.DataTable();
+        data.addColumn('number', 'Day');
+        data.addColumn('number', 'Temperature');
+
+        for (var i = 0; i < 15; i++) {
+            var simulatedTemp = Math.random();
+            data.addRow([i, simulatedTemp * 5 + 20]);
+        }
+
+        var options = {
+            hAxis: {
+                title: 'Time'
+            },
+            vAxis: {
+                title: 'Temperature'
+            },
+            backgroundColor: '#f0f0f0'
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+        chart.draw(data, options);
+
+
+        var data2 = new google.visualization.DataTable();
+        data2.addColumn('number', 'Day');
+        data2.addColumn('number', 'Temperature');
+
+        for (var i = 0; i < 15; i++) {
+            var simulatedTemp = Math.random();
+            data2.addRow([i, simulatedTemp * 5 + 20]);
+        }
+
+        var options = {
+            hAxis: {
+                title: 'Time'
+            },
+            vAxis: {
+                title: 'Temperature'
+            },
+            backgroundColor: '#f0f0f0'
+        };
+        var chart2 = new google.visualization.LineChart(document.getElementById('chart_div2'));
+        chart2.draw(data2, options);
+    }
     div.innerHTML = html;
     this.container.appendChild(div);
 }
-DashboardPanel.prototype = Object.create(Autodesk.Viewing.UI.DockingPanel.prototype);
-DashboardPanel.prototype.constructor = DashboardPanel;
+ChartPanel.prototype = Object.create(Autodesk.Viewing.UI.DockingPanel.prototype);
+ChartPanel.prototype.constructor = ChartPanel;
+
 
 function showElement(value) {
-    
+
     var detectorName = detectors[value];
     var index = detectorName.indexOf("[");
-   
-    var detectorId = detectorName.substring(index+1, detectorName.length-1);
 
-    //console.log(detectorId);
-    viewer.search(detectorId, SearchResult);   
+    var detectorId = detectorName.substring(index + 1, detectorName.length - 1);
+
+    viewer.search(detectorId, SearchResult);
 
     function SearchResult(idArray) {
-        //console.log("Search result ", idArray);        
         viewer.fitToView(idArray);
-    }    
+    }
 }
 
 //-----Get elements from viewer
@@ -374,3 +514,5 @@ function getAlldbIds(rootId, tree) {
     }
     return elementsNames;
 }
+
+
